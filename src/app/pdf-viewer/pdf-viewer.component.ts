@@ -47,8 +47,8 @@ export enum RenderTextMode {
 @Component({
   selector: 'pdf-viewer',
   template: `
-    <div #pdfViewerContainer class="ng2-pdf-viewer-container">
-      <div class="pdfViewer"></div>
+    <div #pdfViewerContainer class='ng2-pdf-viewer-container'>
+      <div class='pdfViewer'></div>
     </div>
   `,
   styleUrls: ['./pdf-viewer.component.scss']
@@ -241,7 +241,7 @@ export class PdfViewerComponent
       pdfWorkerSrc = (window as any).pdfWorkerSrc;
     } else {
       pdfWorkerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfJsVersion
-        }/legacy/build/pdf.worker.min.js`;
+      }/legacy/build/pdf.worker.min.js`;
     }
 
     assign(PDFJS.GlobalWorkerOptions, 'workerSrc', pdfWorkerSrc);
@@ -288,12 +288,7 @@ export class PdfViewerComponent
     if ('src' in changes) {
       this.loadPDF();
     } else if (this._pdf) {
-      if ('renderText' in changes) {
-        this.pdfViewer.textLayerMode = this._renderText
-          ? this._renderTextMode
-          : RenderTextMode.DISABLED;
-        this.resetPdfDocument();
-      } else if ('showAll' in changes) {
+      if ('renderText' in changes || 'showAll' in changes) {
         this.setupViewer();
         this.resetPdfDocument();
       }
@@ -341,7 +336,13 @@ export class PdfViewerComponent
             stickToPage = !this._stickToPage;
           }
 
-          this.pdfViewer._setScale(scale, stickToPage);
+          this.pdfViewer.currentScale = scale;
+          if (stickToPage) {
+            this.pdfViewer.scrollPageIntoView({
+              pageNumber: page.pageNumber,
+              ignoreDestinationZoom: true
+            });
+          }
         }
       });
   }
@@ -414,7 +415,7 @@ export class PdfViewerComponent
     });
     this.pdfFindController = new PDFJSViewer.PDFFindController({
       eventBus: this.eventBus,
-      linkService: this.pdfLinkService,
+      linkService: this.pdfLinkService
     });
   }
 
@@ -429,7 +430,7 @@ export class PdfViewerComponent
         : RenderTextMode.DISABLED,
       findController: this.pdfFindController,
       l10n: new PDFJSViewer.GenericL10n('en'),
-      imageResourcesPath: this._imageResourcesPath,
+      imageResourcesPath: this._imageResourcesPath
     };
   }
 
